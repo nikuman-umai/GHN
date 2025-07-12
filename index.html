@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>逆翻訳ミニアプリ</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+    textarea { width: 100%; height: 100px; }
+    button { margin-top: 10px; padding: 10px 20px; font-size: 16px; }
+    .result { background: #f0f0f0; padding: 10px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🌍 逆翻訳ミニアプリ</h1>
+  <p>日本語 → 英語 → 日本語 に自動で翻訳します。</p>
+
+  <textarea id="inputText" placeholder="例：今日は楽しかったです！"></textarea><br>
+  <button onclick="reverseTranslate()">逆翻訳する</button>
+
+  <div class="result">
+    <p><strong>英訳:</strong> <span id="enText">（ここに表示）</span></p>
+    <p><strong>再翻訳（日本語）:</strong> <span id="jaText">（ここに表示）</span></p>
+  </div>
+
+  <script>
+    async function translate(text, source, target) {
+      const response = await fetch('https://translate.argosopentech.com/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          q: text,
+          source: source,
+          target: target,
+          format: "text"
+        })
+      });
+      const data = await response.json();
+      return data.translatedText;
+    }
+
+    async function reverseTranslate() {
+      const input = document.getElementById("inputText").value.trim();
+      if (!input) return alert("文章を入力してください！");
+
+      const en = await translate(input, "ja", "en");
+      document.getElementById("enText").innerText = en;
+
+      const ja = await translate(en, "en", "ja");
+      document.getElementById("jaText").innerText = ja;
+    }
+  </script>
+</body>
+</html>
